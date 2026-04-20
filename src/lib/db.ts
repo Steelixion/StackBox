@@ -106,6 +106,10 @@ export interface BundlingStrategy {
   name: string;
   components: string[];
   projectedMargin: string;
+  applied?: boolean;
+  deletedAt?: string | null;
+  createdBy?: string;
+  updatedBy?: string;
 }
 
 export interface SystemAlert {
@@ -115,6 +119,17 @@ export interface SystemAlert {
   message: string;
   time: string;
   dismissed: boolean;
+}
+
+export interface MarketGraphData {
+  date: string;
+  internal: number;
+  market: number;
+}
+
+export interface DemandForecastData {
+  period: string;
+  units: number;
 }
 
 export interface DatabaseSchema {
@@ -128,6 +143,8 @@ export interface DatabaseSchema {
   acquisitionTargets: AcquisitionTarget[];
   bundlingStrategies: BundlingStrategy[];
   systemAlerts: SystemAlert[];
+  marketGraph: MarketGraphData[];
+  demandForecast: DemandForecastData[];
 }
 
 // ─── Core Read / Write ──────────────────────────────────────────────────────
@@ -143,6 +160,18 @@ const DEFAULT_DB: DatabaseSchema = {
   acquisitionTargets: [],
   bundlingStrategies: [],
   systemAlerts: [],
+  marketGraph: [
+    { date: 'Apr 01', internal: 4000, market: 4200 },
+    { date: 'Apr 05', internal: 4100, market: 4400 },
+    { date: 'Apr 10', internal: 4050, market: 4600 },
+    { date: 'Apr 15', internal: 4250, market: 4500 },
+    { date: 'Apr 20', internal: 4200, market: 5100 },
+  ],
+  demandForecast: [
+    { period: '30 Days', units: 12000 },
+    { period: '60 Days', units: 18000 },
+    { period: '90 Days', units: 25000 },
+  ]
 };
 
 export async function readDB(): Promise<DatabaseSchema> {
@@ -350,7 +379,76 @@ export async function getAcquisitionTargets(): Promise<AcquisitionTarget[]> {
 
 export async function getBundlingStrategies(): Promise<BundlingStrategy[]> {
   const db = await readDB();
-  return db.bundlingStrategies;
+  return db.bundlingStrategies.filter(b => !b.deletedAt);
+}
+
+export async function createBundlingStrategy(
+  data: Omit<BundlingStrategy, 'id'>
+): Promise<BundlingStrategy> {
+  const db = await readDB();
+  const maxId = db.bundlingStrategies.reduce((max, b) => Math.max(max, b.id), 0);
+  const newBundle: BundlingStrategy = {
+    ...data,
+    id: maxId + 1,
+    applied: false,
+    deletedAt: null,
+  };
+  db.bundlingStrategies.unshift(newBundle);
+  await writeDB(db);
+  return newBundle;
+}
+
+export async function toggleBundlingStrategy(
+  id: number,
+  updatedBy: string
+): Promise<BundlingStrategy | null> {
+  const db = await readDB();
+  const idx = db.bundlingStrategies.findIndex(b => b.id === id);
+  if (idx === -1) return null;
+  
+  db.bundlingStrategies[idx] = {
+    ...db.bundlingStrategies[idx],
+    applied: !db.bundlingStrategies[idx].applied,
+    updatedBy,
+  };
+  
+  await writeDB(db);
+  return db.bundlingStrategies[idx];
+}
+
+export async function softDeleteBundlingStrategy(
+  id: number,
+  updatedBy: string
+): Promise<boolean> {
+  const db = await readDB();
+  const idx = db.bundlingStrategies.findIndex(b => b.id === id);
+  if (idx === -1) return false;
+
+  db.bundlingStrategies[idx] = {
+    ...db.bundlingStrategies[idx],
+    deletedAt: new Date().toISOString(),
+    updatedBy,
+  };
+  
+  await writeDB(db);
+  return true;
+}
+
+export async function applyAllBundlingStrategies(): Promise<boolean> {
+  const db = await readDB();
+  let modified = false;
+  db.bundlingStrategies = db.bundlingStrategies.map(bundle => {
+    if (!bundle.applied) {
+      modified = true;
+      return { ...bundle, applied: true };
+    }
+    return bundle;
+  });
+  
+  if (modified) {
+    await writeDB(db);
+  }
+  return true;
 }
 
 // ─── System Alert Repository ──────────────────────────────────────────────
@@ -367,4 +465,31 @@ export async function dismissSystemAlert(id: string): Promise<void> {
     db.systemAlerts[idx].dismissed = true;
     await writeDB(db);
   }
+}
+
+// ─── Analytics & Graph Repositories ──────────────────────────────────────────────
+
+export async function getMarketGraphData(): Promise<MarketGraphData[]> {
+  const db = await readDB();
+  return db.marketGraph || [];
+}
+
+export async function getDemandForecastData(): Promise<DemandForecastData[]> {
+  const db = await readDB();
+  return db.demandForecast || [];
+}
+
+/**
+ * Aggregates unique product/item names from across the entire database.
+ */
+export async function getInventoryProductNames(): Promise<string[]> {
+  const db = await readDB();
+  const products = new Set<string>();
+
+  db.shipments.forEach((s) => products.add(s.product));
+  db.qrCodes.forEach((q) => products.add(q.item));
+  db.restockSuggestions.forEach((r) => products.add(r.item));
+  db.acquisitionTargets.forEach((a) => products.add(a.item));
+
+  return Array.from(products).sort();
 }

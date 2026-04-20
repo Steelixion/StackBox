@@ -1,0 +1,40 @@
+{
+  "notifications": [
+    {
+      "id": "notif-1",
+      "category": "shipment",
+      "level": "critical",
+      "title": "Exception Alert: TRK-514",
+      "message": "Shipment delayed by 48hrs due to port clearance.",
+      "timestamp": "10 mins ago",
+      "read": true
+    },
+    {
+      "id": "notif-2",
+      "category": "shipment",
+      "level": "info",
+      "title": "Delivery Arrived",
+      "message": "TRK-118-C successfully offloaded at primary facility.",
+      "timestamp": "2 hours ago",
+      "read": true
+    },
+    {
+      "id": "notif-3",
+      "category": "normal",
+      "level": "info",
+      "title": "System Update Complete",
+      "message": "Predictive models updated successfully. Network latency stabilized.",
+      "timestamp": "4 hours ago",
+      "read": true
+    },
+    {
+      "id": "notif-4",
+      "category": "normal",
+      "level": "critical",
+      "title": "Stock Shortage Warning",
+      "message": "Copper Rods (C12) falling below critical operational threshold in Zone 4.",
+      "timestamp": "1 day ago",
+      "read": true
+    }
+  ]
+}

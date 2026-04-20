@@ -200,7 +200,14 @@ export default function LoginPage() {
                 </svg>
                 Fill demo credentials
               </button>
-              <a href="#" className="text-xs font-medium text-steel hover:text-deep-ink transition-colors">
+              <a
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setError('Password reset is not available in demo mode.');
+                }}
+                className="text-xs font-medium text-steel hover:text-deep-ink transition-colors"
+              >
                 Forgot password?
               </a>
             </div>

@@ -27,7 +27,7 @@ async function getWarehouseContext() {
 
   const activeShipments = shipments.filter(s => s.status === 'In-Transit');
   const pendingApprovals = restock.filter(r => !r.approved);
-  
+
   return `
 CURRENT WAREHOUSE STATE:
 - Active Shipments: ${activeShipments.length} (tracking IDs: ${activeShipments.map(s => s.id).join(', ')})

@@ -122,26 +122,22 @@
       "printed": false
     }
   ],
-  "invoiceReviewQueue": [
+  "invoiceReviewQueue": [],
+  "invoiceLedger": [
     {
       "id": "INV-9923",
-      "vendor": "TechFoundry Silicon",
-      "confidence": 82,
-      "raw": {
-        "vendor": "Tech Foundry Silicon",
-        "lines": [
-          {
-            "item": "Microchips (X99)",
-            "qty": "l200",
-            "price": "$15.20"
-          }
-        ]
-      },
-      "image": "https://placehold.co/400x550/1E293B/94A3B8?text=INVOICE+SCANNED+IMAGE+TechFoundry",
-      "createdAt": "2026-04-15T14:00:00Z"
-    }
-  ],
-  "invoiceLedger": [
+      "vendor": "Tech Foundry Silicon",
+      "date": "2026-04-20",
+      "total": "$3040.00",
+      "sync": true,
+      "lineItems": [
+        {
+          "item": "Microchips (X99)",
+          "qty": "l200",
+          "price": "$15.20"
+        }
+      ]
+    },
     {
       "id": "INV-4091",
       "vendor": "AeroMat&rials",
@@ -255,6 +251,19 @@
   ],
   "bundlingStrategies": [
     {
+      "name": "EVV",
+      "projectedMargin": "+15%",
+      "components": [
+        "Aluminum Sheets (A34)",
+        "Industrial Bolts (B99)"
+      ],
+      "createdBy": "Admin_MGR_01",
+      "updatedBy": "Admin_MGR_01",
+      "id": 3,
+      "applied": true,
+      "deletedAt": null
+    },
+    {
       "id": 1,
       "name": "EV Assembly Kit",
       "components": [
@@ -262,7 +271,9 @@
         "Copper Wire",
         "Microchips (X99)"
       ],
-      "projectedMargin": "+22%"
+      "projectedMargin": "+22%",
+      "applied": false,
+      "updatedBy": "Admin_MGR_01"
     },
     {
       "id": 2,
@@ -271,7 +282,8 @@
         "Steel Beams (S12)",
         "Aluminum Sheets (A34)"
       ],
-      "projectedMargin": "+14%"
+      "projectedMargin": "+14%",
+      "applied": true
     }
   ],
   "systemAlerts": [
@@ -298,6 +310,47 @@
       "message": "Shipment #492-B (Steel Coils) is delayed by 48 hours beyond expected arrival.",
       "time": "2 hours ago",
       "dismissed": false
+    }
+  ],
+  "marketGraph": [
+    {
+      "date": "Apr 01",
+      "internal": 4000,
+      "market": 4200
+    },
+    {
+      "date": "Apr 05",
+      "internal": 4100,
+      "market": 4400
+    },
+    {
+      "date": "Apr 10",
+      "internal": 4050,
+      "market": 4600
+    },
+    {
+      "date": "Apr 15",
+      "internal": 4250,
+      "market": 4500
+    },
+    {
+      "date": "Apr 20",
+      "internal": 4200,
+      "market": 5100
+    }
+  ],
+  "demandForecast": [
+    {
+      "period": "30 Days",
+      "units": 12000
+    },
+    {
+      "period": "60 Days",
+      "units": 18000
+    },
+    {
+      "period": "90 Days",
+      "units": 25000
     }
   ]
 }

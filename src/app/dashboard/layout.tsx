@@ -3,8 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import FloatingAgent from '../../components/FloatingAgent';
-import { fetchSystemAlerts, dismissDashboardAlert } from '@/actions/dashboard';
-import type { SystemAlert } from '@/lib/db';
+import type { NotificationItem } from '@/lib/notifications-db';
 
 interface SessionUser {
   id: string;
@@ -16,7 +15,7 @@ interface SessionUser {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<SessionUser | null>(null);
-  const [notifications, setNotifications] = useState<SystemAlert[]>([]);
+  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [dismissingId, setDismissingId] = useState<string | null>(null);
@@ -35,8 +34,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   // ── Load live notifications ───────────────────────────────────────────────
   const loadNotifications = useCallback(async () => {
-    const alerts = await fetchSystemAlerts();
-    setNotifications(alerts);
+    try {
+      const res = await fetch('/api/notifications');
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data.notifications.filter((n: NotificationItem) => !n.read));
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   useEffect(() => {
@@ -59,7 +65,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   // ── Dismiss a notification ────────────────────────────────────────────────
   const handleDismiss = async (id: string) => {
     setDismissingId(id);
-    await dismissDashboardAlert(id);
+    await fetch('/api/notifications', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    });
     setNotifications((prev) => prev.filter((n) => n.id !== id));
     setDismissingId(null);
   };
@@ -76,9 +86,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ? user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()
     : '??';
 
-  const alertDotColor = (type: SystemAlert['type']) => {
-    if (type === 'sell') return 'bg-jade';
-    if (type === 'delay') return 'bg-cinnabar';
+  const alertDotColor = (level: NotificationItem['level']) => {
+    if (level === 'info') return 'bg-jade';
+    if (level === 'critical') return 'bg-cinnabar';
     return 'bg-steel';
   };
 
@@ -87,6 +97,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { name: 'Inventory Trading', href: '/dashboard/inventory-trading', icon: 'M13 7h8m0 0v8m0-8l-8 8-4-4-6 6' },
     { name: 'Shipments', href: '/dashboard/shipments', icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4' },
     { name: 'Invoices (OCR)', href: '/dashboard/invoices', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
+    { name: 'Bundles Engine', href: '/dashboard/bundles', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+    { name: 'Alerts Hub', href: '/dashboard/alerts', icon: 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9' },
   ];
 
   return (
@@ -198,7 +210,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       <button
                         onClick={async () => {
                           // Dismiss all at once
-                          for (const n of notifications) await dismissDashboardAlert(n.id);
+                          for (const n of notifications) {
+                            await fetch('/api/notifications', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: n.id }) });
+                          }
                           setNotifications([]);
                         }}
                         className="text-xs font-bold text-jade hover:text-jade/80 transition-colors"
@@ -219,12 +233,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       </div>
                     ) : (
                       notifications.map((n) => (
-                        <div key={n.id} className={`px-5 py-4 group hover:bg-porcelain/40 transition-colors flex items-start space-x-3 ${n.type === 'delay' ? 'bg-cinnabar/5' : ''}`}>
-                          <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${alertDotColor(n.type)}`} />
+                        <div key={n.id} className={`px-5 py-4 group hover:bg-porcelain/40 transition-colors flex items-start space-x-3 ${n.level === 'critical' ? 'bg-cinnabar/5' : ''}`}>
+                          <div className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${alertDotColor(n.level)}`} />
                           <div className="flex-1 min-w-0">
-                            <p className={`text-xs font-bold ${n.type === 'delay' ? 'text-cinnabar-dark' : 'text-deep-ink'}`}>{n.title}</p>
+                            <p className={`text-xs font-bold ${n.level === 'critical' ? 'text-cinnabar-dark' : 'text-deep-ink'}`}>{n.title}</p>
                             <p className="text-xs text-steel mt-0.5 leading-relaxed">{n.message}</p>
-                            <p className="text-[10px] text-steel/60 mt-1.5 font-mono">{n.time}</p>
+                            <p className="text-[10px] text-steel/60 mt-1.5 font-mono">{n.timestamp}</p>
                           </div>
                           <button
                             onClick={() => handleDismiss(n.id)}
@@ -244,11 +258,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   {/* Footer */}
                   <div className="px-5 py-3 border-t border-steel/10 bg-porcelain/30">
                     <Link
-                      href="/dashboard"
+                      href="/dashboard/alerts"
                       className="text-xs font-medium text-jade hover:text-jade/80 transition-colors"
                       onClick={() => setNotifOpen(false)}
                     >
-                      View all in Dashboard →
+                      View all in Dashboard Hub →
                     </Link>
                   </div>
                 </div>

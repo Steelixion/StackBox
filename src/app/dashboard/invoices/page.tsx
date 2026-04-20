@@ -7,6 +7,8 @@ import {
   confirmAndSyncInvoice,
 } from '@/actions/invoices';
 import type { InvoiceReviewItem, InvoiceLedgerEntry, InvoiceLineItem } from '@/lib/db';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
 
 export default function InvoicesOCRPage() {
   const [reviewQueue, setReviewQueue] = useState<InvoiceReviewItem[]>([]);
@@ -214,8 +216,48 @@ export default function InvoicesOCRPage() {
                           )}
                         </td>
                         <td className="px-8 py-6 text-right">
-                          <button className="text-jade hover:text-deep-ink transition-colors" title="Download PDF">
-                            <svg className="w-5 h-5 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                          <button
+                            onClick={() => {
+                              const doc = new jsPDF();
+                              doc.setFontSize(22);
+                              doc.setTextColor(11, 15, 25); // deep-ink
+                              doc.text('StackBox Internal Invoice Ledger', 14, 20);
+
+                              doc.setFontSize(12);
+                              doc.setTextColor(148, 163, 184); // steel
+                              doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 28);
+
+                              doc.setDrawColor(226, 232, 240); // line color
+                              doc.line(14, 32, 196, 32);
+
+                              doc.setFontSize(14);
+                              doc.setTextColor(11, 15, 25);
+                              doc.text(`Invoice ID: ${inv.id}`, 14, 42);
+                              doc.text(`Vendor: ${inv.vendor}`, 14, 50);
+                              doc.text(`Date Processed: ${inv.date}`, 14, 58);
+                              doc.text(`Status: ${inv.sync ? 'SYNCED TO GLOBAL MASTER' : 'PENDING SYNC'}`, 14, 66);
+                              doc.setFont('Ariel', 'bold');
+                              doc.text(`Total Authorized: ${inv.total}`, 14, 76);
+                              doc.setFont('Ariel', 'normal');
+
+                              const tableData = inv.lineItems ? inv.lineItems.map(item => [item.item, item.qty, item.price]) : [];
+
+                              // @ts-ignore
+                              autoTable(doc, {
+                                startY: 85,
+                                head: [['Item Description', 'Quantity', 'Price']],
+                                body: tableData,
+                                theme: 'striped',
+                                headStyles: { fillColor: [45, 212, 191] }, // jade
+                                styles: { fontSize: 10, cellPadding: 4 }
+                              });
+
+                              doc.save(`${inv.id}_StackBox_Report.pdf`);
+                            }}
+                            className="text-jade hover:text-deep-ink transition-colors group relative"
+                            title="Download Full Report PDF"
+                          >
+                            <svg className="w-5 h-5 inline-block group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                           </button>
                         </td>
                       </tr>

@@ -1,19 +1,35 @@
 'use client';
 import React, { useEffect, useState, useCallback } from 'react';
-import { fetchSystemAlerts, dismissDashboardAlert, fetchDashboardKPIs, type DashboardKPIs } from '@/actions/dashboard';
-import type { SystemAlert } from '@/lib/db';
+import { useRouter } from 'next/navigation';
+import { dismissDashboardAlert, fetchDashboardKPIs, fetchMarketGraphData, type DashboardKPIs } from '@/actions/dashboard';
+import type { NotificationItem } from '@/lib/notifications-db';
+import type { MarketGraphData } from '@/lib/db';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [kpis, setKpis] = useState<DashboardKPIs | null>(null);
-  const [alerts, setAlerts] = useState<SystemAlert[]>([]);
+  const [alerts, setAlerts] = useState<NotificationItem[]>([]);
+  const [graphData, setGraphData] = useState<MarketGraphData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dismissingId, setDismissingId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    const [k, a] = await Promise.all([fetchDashboardKPIs(), fetchSystemAlerts()]);
+    const [k, g] = await Promise.all([fetchDashboardKPIs(), fetchMarketGraphData()]);
     setKpis(k);
-    setAlerts(a);
+    setGraphData(g);
+    
+    try {
+      const res = await fetch('/api/notifications');
+      if (res.ok) {
+        const data = await res.json();
+        setAlerts(data.notifications.filter((n: NotificationItem) => !n.read));
+      }
+    } catch {
+      // fallback
+    }
+    
     setIsLoading(false);
   }, []);
 
@@ -21,19 +37,19 @@ export default function DashboardPage() {
 
   const handleDismissAlert = async (id: string) => {
     setDismissingId(id);
-    await dismissDashboardAlert(id);
+    await fetch('/api/notifications', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
     setAlerts((prev) => prev.filter((a) => a.id !== id));
     setDismissingId(null);
   };
 
-  const alertDotColor = (type: SystemAlert['type']) => {
-    if (type === 'sell') return 'bg-jade shadow-[var(--drop-shadow-glow-jade)]';
-    if (type === 'delay') return 'bg-cinnabar shadow-[var(--drop-shadow-glow-cinnabar)]';
+  const alertDotColor = (level: NotificationItem['level']) => {
+    if (level === 'info') return 'bg-jade shadow-[var(--drop-shadow-glow-jade)]';
+    if (level === 'critical') return 'bg-cinnabar shadow-[var(--drop-shadow-glow-cinnabar)]';
     return 'bg-steel';
   };
 
-  const alertItemBg = (type: SystemAlert['type']) => {
-    if (type === 'delay') return 'bg-cinnabar/5 hover:bg-cinnabar/10';
+  const alertItemBg = (level: NotificationItem['level']) => {
+    if (level === 'critical') return 'bg-cinnabar/5 hover:bg-cinnabar/10';
     return 'bg-porcelain/30 hover:bg-porcelain/50';
   };
 
@@ -101,19 +117,40 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl shadow-sm p-8">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-lg font-bold text-deep-ink">Market vs. Internal Stock</h2>
-              <button className="text-sm font-medium text-jade hover:text-jade/80 transition-colors">View Deep Analysis</button>
+              <button onClick={() => router.push('/dashboard/inventory-trading')} className="text-sm font-medium text-jade hover:text-jade/80 transition-colors">View Deep Analysis</button>
             </div>
 
-            {/* Chart Placeholder */}
-            <div className="w-full h-64 bg-porcelain rounded-lg border border-steel/20 flex flex-col items-center justify-center relative overflow-hidden group">
-              <svg className="w-12 h-12 text-steel/40 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-              </svg>
-              <span className="text-steel font-medium text-sm">Dynamic Chart Rendering...</span>
-
-              <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-jade/10 to-transparent opacity-50"></div>
-              <div className="absolute inset-x-0 bottom-1/4 h-0.5 bg-jade/30 w-full transform -rotate-2"></div>
-              <div className="absolute inset-x-0 bottom-1/3 h-0.5 bg-deep-ink/20 w-full transform rotate-1"></div>
+            {/* Chart */}
+            <div className="w-full h-72 rounded-lg border border-steel/20 p-4 mt-6">
+              {isLoading ? (
+                <div className="w-full h-full flex items-center justify-center bg-porcelain animate-pulse rounded-lg text-steel text-sm">
+                  Loading Market Vectors...
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={graphData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="colorInternal" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2DD4BF" stopOpacity={0.8}/>
+                        <stop offset="95%" stopColor="#2DD4BF" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="colorMarket" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#0B0F19" stopOpacity={0.4}/>
+                        <stop offset="95%" stopColor="#0B0F19" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                    <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} dy={10} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} />
+                    <Tooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
+                      labelStyle={{ fontWeight: 'bold', color: '#0B0F19', marginBottom: '4px' }}
+                    />
+                    <Area type="monotone" dataKey="market" stroke="#0B0F19" strokeWidth={2} fillOpacity={1} fill="url(#colorMarket)" />
+                    <Area type="monotone" dataKey="internal" stroke="#2DD4BF" strokeWidth={3} fillOpacity={1} fill="url(#colorInternal)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
 
             <div className="mt-8 grid grid-cols-2 gap-6">
@@ -145,7 +182,7 @@ export default function DashboardPage() {
 
             <h2 className="text-lg font-bold text-deep-ink mb-4 relative z-10">Action Center</h2>
             <div className="space-y-4 relative z-10">
-              <button className="w-full flex items-center justify-between py-4 px-6 bg-porcelain hover:bg-porcelain/80 rounded-xl transition-colors group relative overflow-hidden group/laser">
+              <button onClick={() => router.push('/dashboard/invoices')} className="w-full flex items-center justify-between py-4 px-6 bg-porcelain hover:bg-porcelain/80 rounded-xl transition-colors group relative overflow-hidden group/laser">
                 <div className="absolute left-0 right-0 h-[1px] bg-jade shadow-[var(--drop-shadow-glow-jade)] opacity-0 group-hover/laser:opacity-100 group-hover/laser:animate-[sweepLaser_1.2s_ease-in-out_infinite] z-20 pointer-events-none top-0" />
                 <div className="flex items-center">
                   <svg className="w-5 h-5 text-jade mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -156,7 +193,7 @@ export default function DashboardPage() {
                 <span className="text-xs text-jade group-hover:translate-x-1 transition-transform">→</span>
               </button>
 
-              <button className="w-full flex items-center justify-between py-4 px-6 bg-porcelain hover:bg-porcelain/80 rounded-xl transition-colors group">
+              <button onClick={() => router.push('/dashboard/shipments')} className="w-full flex items-center justify-between py-4 px-6 bg-porcelain hover:bg-porcelain/80 rounded-xl transition-colors group">
                 <div className="flex items-center">
                   <svg className="w-5 h-5 text-deep-ink mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
@@ -187,7 +224,7 @@ export default function DashboardPage() {
               )}
             </div>
 
-            <div className="flex-1 overflow-y-auto px-8 pb-4 space-y-4">
+            <div id="alerts-container" className="flex-1 overflow-y-auto px-8 pb-4 space-y-4">
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
@@ -201,14 +238,14 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 alerts.map((alert) => (
-                  <div key={alert.id} className={`p-4 rounded-xl transition-colors group ${alertItemBg(alert.type)}`}>
+                  <div key={alert.id} className={`p-4 rounded-xl transition-colors group ${alertItemBg(alert.level)}`}>
                     <div className="flex items-start space-x-3">
-                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${alertDotColor(alert.type)}`}></div>
+                      <div className={`w-2 h-2 mt-1.5 rounded-full flex-shrink-0 ${alertDotColor(alert.level)}`}></div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold ${alert.type === 'delay' ? 'text-cinnabar-dark' : 'text-deep-ink'}`}>{alert.title}</p>
+                        <p className={`text-sm font-semibold ${alert.level === 'critical' ? 'text-cinnabar-dark' : 'text-deep-ink'}`}>{alert.title}</p>
                         <p className="text-xs text-steel mt-0.5 leading-relaxed">{alert.message}</p>
                         <div className="flex items-center justify-between mt-2">
-                          <p className="text-xs text-steel/70 font-medium">{alert.time}</p>
+                          <p className="text-xs text-steel/70 font-medium">{alert.timestamp}</p>
                           <button
                             onClick={() => handleDismissAlert(alert.id)}
                             disabled={dismissingId === alert.id}
@@ -225,8 +262,11 @@ export default function DashboardPage() {
             </div>
 
             <div className="px-8 pb-8 pt-4">
-              <button className="w-full p-4 text-xs font-medium text-steel hover:text-deep-ink bg-porcelain/50 rounded-xl transition-colors">
-                View All Alerts
+              <button 
+                onClick={() => router.push('/dashboard/alerts')} 
+                className="w-full p-4 text-xs font-medium text-steel hover:text-deep-ink bg-porcelain/50 rounded-xl transition-colors"
+              >
+                View All Alerts & History
               </button>
             </div>
           </div>

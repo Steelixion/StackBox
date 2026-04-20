@@ -10,7 +10,9 @@ import {
   getShipments,
   getInvoiceReviewQueue,
   getRestockSuggestions,
+  getMarketGraphData,
   type SystemAlert,
+  type MarketGraphData,
 } from '@/lib/db';
 
 export interface DashboardKPIs {
@@ -49,4 +51,8 @@ export async function fetchDashboardKPIs(): Promise<DashboardKPIs> {
     pendingOcrInvoices: queue.length,
     pendingRestockApprovals: pendingApprovals,
   };
+}
+
+export async function fetchMarketGraphData(): Promise<MarketGraphData[]> {
+  return getMarketGraphData();
 }

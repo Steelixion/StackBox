@@ -7,8 +7,11 @@ import {
   approveRestockItem,
   fetchAcquisitionTargets,
   fetchBundlingStrategies,
+  fetchDemandForecastData,
+  applyGlobalMatrixEngine,
 } from '@/actions/inventory';
-import type { TradingAlert, RestockSuggestion, AcquisitionTarget, BundlingStrategy } from '@/lib/db';
+import type { TradingAlert, RestockSuggestion, AcquisitionTarget, BundlingStrategy, DemandForecastData } from '@/lib/db';
+import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const CURRENT_USER = 'JDoe_MGR_77';
 
@@ -17,24 +20,28 @@ export default function InventoryTradingPage() {
   const [restockItems, setRestockItems] = useState<RestockSuggestion[]>([]);
   const [acquisitions, setAcquisitions] = useState<AcquisitionTarget[]>([]);
   const [bundles, setBundles] = useState<BundlingStrategy[]>([]);
+  const [forecastData, setForecastData] = useState<DemandForecastData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dismissingId, setDismissingId] = useState<number | null>(null);
   const [approvingId, setApprovingId] = useState<number | null>(null);
+  const [isApplyingMatrix, setIsApplyingMatrix] = useState(false);
 
   const pendingCount = restockItems.filter((r) => !r.approved).length;
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
-    const [a, r, acq, b] = await Promise.all([
+    const [a, r, acq, b, f] = await Promise.all([
       fetchTradingAlerts(),
       fetchRestockSuggestions(),
       fetchAcquisitionTargets(),
       fetchBundlingStrategies(),
+      fetchDemandForecastData(),
     ]);
     setAlerts(a);
     setRestockItems(r);
     setAcquisitions(acq);
     setBundles(b);
+    setForecastData(f);
     setIsLoading(false);
   }, []);
 
@@ -54,6 +61,13 @@ export default function InventoryTradingPage() {
       setRestockItems((prev) => prev.map((r) => r.id === id ? updated : r));
     }
     setApprovingId(null);
+  };
+
+  const handleApplyMatrix = async () => {
+    setIsApplyingMatrix(true);
+    await applyGlobalMatrixEngine();
+    setBundles((prev) => prev.map((b) => ({ ...b, applied: true })));
+    setIsApplyingMatrix(false);
   };
 
   if (isLoading) {
@@ -123,34 +137,18 @@ export default function InventoryTradingPage() {
             </select>
           </div>
 
-          <div className="flex-1 w-full bg-deep-ink rounded-lg border border-steel/20 p-4 relative overflow-hidden flex items-end shadow-inner min-h-[180px]">
-            <div className="absolute inset-0 flex flex-col justify-between py-4 opacity-10 pointer-events-none">
-              <div className="w-full border-t border-porcelain"></div>
-              <div className="w-full border-t border-porcelain"></div>
-              <div className="w-full border-t border-porcelain"></div>
-              <div className="w-full border-t border-porcelain"></div>
-            </div>
-
-            <div className="w-full h-full flex items-end justify-between space-x-2 px-2 relative z-10">
-              <div className="flex flex-col items-center w-1/3">
-                <div className="w-full bg-jade/40 hover:bg-jade/60 transition-colors rounded-t-sm h-[40%] flex justify-center group relative cursor-pointer">
-                  <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-white text-deep-ink text-xs py-1 px-2 rounded shadow font-bold transition-opacity">12k Units</div>
-                </div>
-                <span className="text-xs text-porcelain mt-2 font-mono">30 Days</span>
-              </div>
-              <div className="flex flex-col items-center w-1/3">
-                <div className="w-full bg-jade/60 hover:bg-jade/80 transition-colors rounded-t-sm h-[65%] flex justify-center group relative cursor-pointer">
-                  <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-white text-deep-ink text-xs py-1 px-2 rounded shadow font-bold transition-opacity">18k Units</div>
-                </div>
-                <span className="text-xs text-porcelain mt-2 font-mono">60 Days</span>
-              </div>
-              <div className="flex flex-col items-center w-1/3">
-                <div className="w-full bg-jade hover:bg-jade/90 shadow-[var(--drop-shadow-glow-jade)] transition-colors rounded-t-sm h-[90%] flex justify-center group relative cursor-pointer">
-                  <div className="opacity-0 group-hover:opacity-100 absolute -top-8 bg-white text-deep-ink text-xs py-1 px-2 rounded shadow font-bold transition-opacity">25k Units</div>
-                </div>
-                <span className="text-xs text-porcelain mt-2 font-mono">90 Days</span>
-              </div>
-            </div>
+          <div className="flex-1 w-full bg-deep-ink rounded-lg border border-steel/20 p-4 min-h-[180px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={forecastData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
+                <XAxis dataKey="period" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} dy={10} />
+                <Tooltip
+                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                  contentStyle={{ borderRadius: '8px', border: 'none', backgroundColor: '#FFFFFF', color: '#0B0F19' }}
+                  itemStyle={{ fontWeight: 'bold' }}
+                />
+                <Bar dataKey="units" fill="#2DD4BF" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
@@ -339,21 +337,31 @@ export default function InventoryTradingPage() {
               </h2>
               <div className="space-y-3">
                 {bundles.map((bundle) => (
-                  <div key={bundle.id} className="relative p-4 rounded-xl border border-steel/10 bg-white">
+                  <div key={bundle.id} className={`relative p-4 rounded-xl border transition-colors ${bundle.applied ? 'bg-jade/5 border-jade/30' : 'bg-white border-steel/10'}`}>
+                    {bundle.applied && (
+                      <div className="absolute -top-2 -right-2 bg-jade text-deep-ink text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm flex items-center border border-white">
+                        <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                        APPLIED
+                      </div>
+                    )}
                     <div className="flex justify-between items-start mb-3">
-                      <p className="text-xs font-bold text-deep-ink uppercase tracking-wide">{bundle.name}</p>
-                      <span className="text-[10px] font-bold text-jade bg-jade/10 px-1.5 py-0.5 rounded border border-jade/20">{bundle.projectedMargin} Margin</span>
+                      <p className={`text-xs font-bold uppercase tracking-wide ${bundle.applied ? 'text-deep-ink' : 'text-deep-ink'}`}>{bundle.name}</p>
+                      <span className="text-[10px] font-bold text-deep-ink bg-jade/10 px-1.5 py-0.5 rounded border border-jade/20">{bundle.projectedMargin} Margin</span>
                     </div>
-                    <div className="flex flex-wrap gap-1.5">
+                    <div className="flex flex-wrap gap-1.5 opacity-90">
                       {bundle.components.map((comp, idx) => (
-                        <span key={idx} className="text-[10px] bg-porcelain px-2 py-1 rounded text-steel border border-steel/10 font-medium">{comp}</span>
+                        <span key={idx} className={`text-[10px] px-2 py-1 rounded font-medium border ${bundle.applied ? 'bg-white text-deep-ink border-jade/20' : 'bg-porcelain text-steel border-steel/10'}`}>{comp}</span>
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="mt-auto pt-4 w-full bg-porcelain text-xs font-bold text-steel py-2.5 rounded border border-steel/10 hover:text-deep-ink hover:bg-white hover:border-jade hover:shadow-[var(--drop-shadow-glow-jade)] transition-all uppercase tracking-wider">
-                Apply Global Matrix
+              <button
+                onClick={handleApplyMatrix}
+                disabled={isApplyingMatrix || bundles.every(b => b.applied)}
+                className="mt-auto pt-4 w-full bg-porcelain text-xs font-bold text-steel py-2.5 rounded border border-steel/10 hover:text-deep-ink hover:bg-white hover:border-jade hover:shadow-[var(--drop-shadow-glow-jade)] transition-all uppercase tracking-wider disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {isApplyingMatrix ? 'APPLYING MATRIX...' : bundles.every(b => b.applied) ? 'MATRIX SYNCED' : 'Apply Global Matrix'}
               </button>
             </div>
           </div>
