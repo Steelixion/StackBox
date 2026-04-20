@@ -1,6 +1,25 @@
 {
   "conversations": [
     {
+      "id": "conv-1776689697998",
+      "title": "Analyze the latest regional market trends and iden...",
+      "createdAt": "2026-04-20T12:54:57.998Z",
+      "messages": [
+        {
+          "id": "msg-1776689698034-wp8aa",
+          "role": "user",
+          "text": "Analyze the latest regional market trends and identify top opportunities.",
+          "timestamp": "2026-04-20T12:54:58.034Z"
+        },
+        {
+          "id": "msg-1776689698068-r2p4w",
+          "role": "ai",
+          "text": "[SIMULATION MODE] I am currently operating without a live Gemini connection, but I've reviewed the warehouse state: CURRENT WAREHOUSE STATE:. How can I assist with your supply chain optimization today?",
+          "timestamp": "2026-04-20T12:54:58.068Z"
+        }
+      ]
+    },
+    {
       "id": "conv-1776344443132",
       "title": "hjhjhj",
       "createdAt": "2026-04-16T13:00:43.132Z",

@@ -1,0 +1,190 @@
+[
+  {
+    "id": "TRD-001",
+    "companyName": "Tesla Matrix Logistics",
+    "email": "ops@tesla-matrix.com",
+    "phone": "+1-555-0101",
+    "status": "Active",
+    "address": "1 Tesla Road, Austin, TX",
+    "totalValue": "$14.2M",
+    "supplies": [
+      { "product": "Lithium-Ion Batteries", "qty": 1200, "unit": "units" },
+      { "product": "Silicon Wafers", "qty": 450, "unit": "packs" },
+      { "product": "Copper Wire (C90)", "qty": 10000, "unit": "meters" }
+    ],
+    "lastAuditDate": "2026-04-10"
+  },
+  {
+    "id": "TRD-002",
+    "companyName": "Rivian Supply Core",
+    "email": "logistics@rivian.co",
+    "phone": "+1-555-0202",
+    "status": "Active",
+    "address": "Irvine, CA",
+    "totalValue": "$8.5M",
+    "supplies": [
+      { "product": "Aluminum Sheets (A34)", "qty": 500, "unit": "sheets" },
+      { "product": "Carbon Fiber Rolls", "qty": 120, "unit": "rolls" }
+    ],
+    "lastAuditDate": "2026-04-12"
+  },
+  {
+    "id": "TRD-003",
+    "companyName": "SpaceX Starlink Fabrications",
+    "email": "shippping@spacex.com",
+    "phone": "+1-555-0303",
+    "status": "Active",
+    "totalValue": "$22.1M",
+    "supplies": [
+      { "product": "Rare Earth Magnets", "qty": 2000, "unit": "units" },
+      { "product": "Steel Beams (S12)", "qty": 50, "unit": "beams" }
+    ],
+    "lastAuditDate": "2026-04-01"
+  },
+  {
+    "id": "TRD-004",
+    "companyName": "Blue Origin New Glenn Systems",
+    "email": "procurement@blueorigin.com",
+    "phone": "+1-555-0404",
+    "status": "Idle",
+    "totalValue": "$2.2M",
+    "supplies": [
+      { "product": "Industrial Bolts (B99)", "qty": 50000, "unit": "units" }
+    ],
+    "lastAuditDate": "2026-03-20"
+  },
+  {
+    "id": "TRD-005",
+    "companyName": "Apple Silicon Foundry",
+    "email": "sc@apple.com",
+    "phone": "+1-555-0505",
+    "status": "Active",
+    "totalValue": "$45.0M",
+    "supplies": [
+      { "product": "Silicon Wafers", "qty": 5000, "unit": "packs" },
+      { "product": "Lithium-Ion Batteries", "qty": 800, "unit": "units" }
+    ],
+    "lastAuditDate": "2026-04-15"
+  },
+  {
+    "id": "TRD-006",
+    "companyName": "Samsung Display Europe",
+    "email": "logi@samsung.eu",
+    "phone": "+49-555-0606",
+    "status": "Active",
+    "totalValue": "$12.4M",
+    "supplies": [
+      { "product": "Rare Earth Magnets", "qty": 1500, "unit": "units" }
+    ],
+    "lastAuditDate": "2026-04-14"
+  },
+  {
+    "id": "TRD-007",
+    "companyName": "Siemens Global Power",
+    "email": "power@siemens.com",
+    "phone": "+49-555-0707",
+    "status": "Idle",
+    "totalValue": "$5.6M",
+    "supplies": [
+      { "product": "Copper Wire (C90)", "qty": 15000, "unit": "meters" }
+    ],
+    "lastAuditDate": "2026-03-15"
+  },
+  {
+    "id": "TRD-008",
+    "companyName": "TSMC Fabrication West",
+    "email": "ops@tsmc.com",
+    "phone": "+886-555-0808",
+    "status": "Active",
+    "totalValue": "$92.0M",
+    "supplies": [
+      { "product": "Silicon Wafers", "qty": 12000, "unit": "packs" }
+    ],
+    "lastAuditDate": "2026-04-18"
+  },
+  {
+    "id": "TRD-009",
+    "companyName": "NIO Electric Hub",
+    "email": "sc@nio.com",
+    "phone": "+86-555-0909",
+    "status": "Active",
+    "totalValue": "$7.2M",
+    "supplies": [
+      { "product": "Lithium-Ion Batteries", "qty": 3000, "unit": "units" }
+    ],
+    "lastAuditDate": "2026-04-17"
+  },
+  {
+    "id": "TRD-010",
+    "companyName": "Lucid Air Dynamics",
+    "email": "logistics@lucid.com",
+    "phone": "+1-555-1010",
+    "status": "Active",
+    "totalValue": "$4.1M",
+    "supplies": [
+      { "product": "Aluminum Sheets (A34)", "qty": 800, "unit": "sheets" }
+    ],
+    "lastAuditDate": "2026-04-11"
+  },
+  {
+    "id": "TRD-011",
+    "companyName": "Boeing Aerostructures",
+    "email": "procurement@boeing.com",
+    "phone": "+1-555-1111",
+    "status": "Active",
+    "totalValue": "$18.4M",
+    "supplies": [
+      { "product": "Carbon Fiber Rolls", "qty": 400, "unit": "rolls" },
+      { "product": "Steel Beams (S12)", "qty": 100, "unit": "beams" }
+    ],
+    "lastAuditDate": "2026-04-05"
+  },
+  {
+    "id": "TRD-012",
+    "companyName": "Airbus Industries",
+    "email": "sc@airbus.com",
+    "phone": "+33-555-1212",
+    "status": "Active",
+    "totalValue": "$21.2M",
+    "supplies": [
+      { "product": "Aluminum Sheets (A34)", "qty": 1500, "unit": "sheets" }
+    ],
+    "lastAuditDate": "2026-04-09"
+  },
+  {
+    "id": "TRD-013",
+    "companyName": "Volvo Hydrogen Tech",
+    "email": "h2@volvo.com",
+    "phone": "+46-555-1313",
+    "status": "Idle",
+    "totalValue": "$3.4M",
+    "supplies": [
+      { "product": "Copper Wire (C90)", "qty": 5000, "unit": "meters" }
+    ],
+    "lastAuditDate": "2026-03-25"
+  },
+  {
+    "id": "TRD-014",
+    "companyName": "Catl Energy Storage",
+    "email": "ops@catl.com",
+    "phone": "+86-555-1414",
+    "status": "Active",
+    "totalValue": "$11.1M",
+    "supplies": [
+      { "product": "Lithium-Ion Batteries", "qty": 4500, "unit": "units" }
+    ],
+    "lastAuditDate": "2026-04-13"
+  },
+  {
+    "id": "TRD-015",
+    "companyName": "Northvolt Matrix",
+    "email": "matrix@northvolt.com",
+    "phone": "+46-555-1515",
+    "status": "Active",
+    "totalValue": "$9.4M",
+    "supplies": [
+      { "product": "Copper Wire (C90)", "qty": 8000, "unit": "meters" }
+    ],
+    "lastAuditDate": "2026-04-16"
+  }
+]

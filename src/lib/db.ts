@@ -11,6 +11,10 @@ import path from 'path';
 
 // ─── Path ──────────────────────────────────────────────────────────────────
 const DB_PATH = path.join(process.cwd(), 'db.json');
+const TRADERS_PATH = path.join(process.cwd(), 'traders.json');
+
+import { z } from 'zod';
+import { TraderSchema, type Trader } from './schemas';
 
 // ─── Type Definitions ──────────────────────────────────────────────────────
 
@@ -492,4 +496,62 @@ export async function getInventoryProductNames(): Promise<string[]> {
   db.acquisitionTargets.forEach((a) => products.add(a.item));
 
   return Array.from(products).sort();
+}
+
+/**
+ * ─── Trader Repository (Enterprise Standard) ──────────────────────────────────
+ */
+
+export async function getTraders(params: {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+}): Promise<{ data: Trader[]; total: number }> {
+  try {
+    const raw = await fs.readFile(TRADERS_PATH, 'utf-8');
+    const allTraders = JSON.parse(raw);
+    
+    // 1. Runtime Validation
+    const validated = z.array(TraderSchema).parse(allTraders);
+    
+    // 2. Filtering
+    let filtered = validated;
+    if (params.search) {
+      const q = params.search.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.companyName.toLowerCase().includes(q) || 
+        t.email.toLowerCase().includes(q)
+      );
+    }
+    if (params.status && params.status !== 'All') {
+      filtered = filtered.filter(t => t.status === params.status);
+    }
+
+    const total = filtered.length;
+
+    // 3. Pagination
+    const page = params.page || 1;
+    const limit = params.limit || 10;
+    const offset = (page - 1) * limit;
+
+    const data = filtered.slice(offset, offset + limit);
+
+    return { data, total };
+  } catch (error) {
+    console.error("Trader retrieval failed:", error);
+    return { data: [], total: 0 };
+  }
+}
+
+export async function getTraderById(id: string): Promise<Trader | null> {
+  try {
+    const raw = await fs.readFile(TRADERS_PATH, 'utf-8');
+    const allTraders = JSON.parse(raw);
+    const validated = z.array(TraderSchema).parse(allTraders);
+    return validated.find(t => t.id === id) || null;
+  } catch (error) {
+    console.error(`Failed to fetch trader ${id}:`, error);
+    return null;
+  }
 }
