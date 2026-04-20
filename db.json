@@ -1,0 +1,303 @@
+{
+  "users": [
+    {
+      "id": "usr-admin-0001",
+      "email": "admin@stackbox.ai",
+      "name": "Admin User",
+      "picture": null,
+      "role": "Manager",
+      "passwordHash": "admin123",
+      "createdAt": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "shipments": [
+    {
+      "id": "TRK-992-A",
+      "product": "Aluminum Sheets (A34)",
+      "status": "In-Transit",
+      "origin": "Shanghai, CN",
+      "destination": "Los Angeles, USA",
+      "expectedArrival": "2026-04-14T10:00:00Z",
+      "deliveredAt": null,
+      "routing": "Sea Freight -> Rail",
+      "history": [
+        {
+          "time": "2026-04-01",
+          "event": "Departed Origin"
+        },
+        {
+          "time": "2026-04-10",
+          "event": "Customs Cleared"
+        }
+      ]
+    },
+    {
+      "id": "TRK-405-B",
+      "product": "Copper Wire (C90)",
+      "status": "In-Stock",
+      "origin": "Local Supplier",
+      "destination": "Warehouse A",
+      "expectedArrival": null,
+      "deliveredAt": null,
+      "routing": "N/A",
+      "history": [
+        {
+          "time": "2026-03-25",
+          "event": "Received in Warehouse"
+        }
+      ]
+    },
+    {
+      "id": "TRK-118-C",
+      "product": "Lithium-Ion Batteries",
+      "status": "Delivered",
+      "origin": "Seoul, KR",
+      "destination": "Austin Factory",
+      "expectedArrival": "2026-04-15T08:00:00Z",
+      "deliveredAt": "2026-04-15T09:22:15Z",
+      "routing": "Air Freight",
+      "history": [
+        {
+          "time": "2026-04-13",
+          "event": "Departed Origin"
+        },
+        {
+          "time": "2026-04-15",
+          "event": "Delivered to Floor"
+        }
+      ]
+    },
+    {
+      "id": "TRK-771-D",
+      "product": "Silicon Wafers",
+      "status": "In-Transit",
+      "origin": "Taipei, TW",
+      "destination": "San Jose, USA",
+      "expectedArrival": "2026-04-18T12:00:00Z",
+      "deliveredAt": null,
+      "routing": "Air Freight",
+      "history": [
+        {
+          "time": "2026-04-15",
+          "event": "Departed Origin"
+        }
+      ]
+    }
+  ],
+  "qrCodes": [
+    {
+      "batch": "BCH-822",
+      "item": "Steel Sheets (S45)",
+      "qty": 931,
+      "printed": false
+    },
+    {
+      "batch": "BCH-100",
+      "item": "Industrial Bolts (B99)",
+      "qty": 929,
+      "printed": false
+    },
+    {
+      "batch": "BCH-398",
+      "item": "Steel Sheets (S45)",
+      "qty": 494,
+      "printed": false
+    },
+    {
+      "batch": "BCH-88",
+      "item": "Steel Beams (S12)",
+      "qty": 500,
+      "printed": true
+    },
+    {
+      "batch": "BCH-89",
+      "item": "Industrial Adhesive",
+      "qty": 120,
+      "printed": true
+    },
+    {
+      "batch": "BCH-90",
+      "item": "Microchips (X99)",
+      "qty": 2500,
+      "printed": false
+    }
+  ],
+  "invoiceReviewQueue": [
+    {
+      "id": "INV-9923",
+      "vendor": "TechFoundry Silicon",
+      "confidence": 82,
+      "raw": {
+        "vendor": "Tech Foundry Silicon",
+        "lines": [
+          {
+            "item": "Microchips (X99)",
+            "qty": "l200",
+            "price": "$15.20"
+          }
+        ]
+      },
+      "image": "https://placehold.co/400x550/1E293B/94A3B8?text=INVOICE+SCANNED+IMAGE+TechFoundry",
+      "createdAt": "2026-04-15T14:00:00Z"
+    }
+  ],
+  "invoiceLedger": [
+    {
+      "id": "INV-4091",
+      "vendor": "AeroMat&rials",
+      "date": "2026-04-16",
+      "total": "$5460.00",
+      "sync": true,
+      "lineItems": [
+        {
+          "item": "Carbon Fiber Rolls",
+          "qty": "100",
+          "price": "$45.00"
+        },
+        {
+          "item": "Resin Mix B",
+          "qty": "8",
+          "price": "$120.S0"
+        }
+      ]
+    },
+    {
+      "id": "INV-1102",
+      "vendor": "VoltTech Inc.",
+      "date": "2026-04-12",
+      "total": "$14,500.00",
+      "sync": true,
+      "lineItems": []
+    },
+    {
+      "id": "INV-1103",
+      "vendor": "Global Logistics",
+      "date": "2026-04-14",
+      "total": "$2,340.00",
+      "sync": true,
+      "lineItems": []
+    }
+  ],
+  "tradingAlerts": [
+    {
+      "id": 1,
+      "type": "sell",
+      "title": "SELL OPPORTUNITY",
+      "message": "Aluminum Sheets (A34) market price is up 12%. Recommend selling 30% of internal stock.",
+      "time": "10 mins ago",
+      "dismissed": false
+    },
+    {
+      "id": 2,
+      "type": "hold",
+      "title": "HOLD ALERT",
+      "message": "Copper Wire (C90) market showing high volatility. Hold current inventory positions.",
+      "time": "45 mins ago",
+      "dismissed": false
+    },
+    {
+      "id": 3,
+      "type": "sell",
+      "title": "SELL OPPORTUNITY",
+      "message": "Steel Beams (S12) reached peak historical valuation.",
+      "time": "2 hours ago",
+      "dismissed": false
+    }
+  ],
+  "restockSuggestions": [
+    {
+      "id": 1,
+      "item": "Lithium-Ion Batteries",
+      "current": 154,
+      "suggested": 500,
+      "reason": "Seasonal trend upcoming",
+      "supplier": "VoltTech Inc.",
+      "approved": true,
+      "approvedBy": "JDoe_MGR_77",
+      "approvedAt": "2026-04-16T11:35:18.698Z"
+    },
+    {
+      "id": 2,
+      "item": "Carbon Fiber Rolls",
+      "current": 23,
+      "suggested": 100,
+      "reason": "Historical sales spike in May",
+      "supplier": "AeroMaterials",
+      "approved": true,
+      "approvedBy": "JDoe_MGR_77",
+      "approvedAt": "2026-04-16T11:35:20.428Z"
+    },
+    {
+      "id": 3,
+      "item": "Microchips (X99)",
+      "current": 405,
+      "suggested": 1200,
+      "reason": "Market scarcity projected",
+      "supplier": "TechFoundry Silicon",
+      "approved": true,
+      "approvedBy": "JDoe_MGR_77",
+      "approvedAt": "2026-04-16T11:40:05.801Z"
+    }
+  ],
+  "acquisitionTargets": [
+    {
+      "id": 1,
+      "item": "Rare Earth Magnets",
+      "trend": "+15% Demand",
+      "action": "Acquire 5,000 units"
+    },
+    {
+      "id": 2,
+      "item": "Silicon Wafers",
+      "trend": "+8% Demand",
+      "action": "Secure long-term contract"
+    }
+  ],
+  "bundlingStrategies": [
+    {
+      "id": 1,
+      "name": "EV Assembly Kit",
+      "components": [
+        "Lithium-Ion Batteries",
+        "Copper Wire",
+        "Microchips (X99)"
+      ],
+      "projectedMargin": "+22%"
+    },
+    {
+      "id": 2,
+      "name": "Structural Base",
+      "components": [
+        "Steel Beams (S12)",
+        "Aluminum Sheets (A34)"
+      ],
+      "projectedMargin": "+14%"
+    }
+  ],
+  "systemAlerts": [
+    {
+      "id": "ALT-001",
+      "type": "sell",
+      "title": "SELL OPPORTUNITY",
+      "message": "Aluminum Sheets (A34) market price is up 12%. Recommend selling 30% of internal stock.",
+      "time": "10 mins ago",
+      "dismissed": false
+    },
+    {
+      "id": "ALT-002",
+      "type": "hold",
+      "title": "HOLD ALERT",
+      "message": "Copper Wire (C90) market showing high volatility. Hold current inventory positions.",
+      "time": "45 mins ago",
+      "dismissed": false
+    },
+    {
+      "id": "ALT-003",
+      "type": "delay",
+      "title": "IN-TRANSIT DELAY",
+      "message": "Shipment #492-B (Steel Coils) is delayed by 48 hours beyond expected arrival.",
+      "time": "2 hours ago",
+      "dismissed": false
+    }
+  ]
+}

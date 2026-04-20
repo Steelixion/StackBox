@@ -1,26 +1,145 @@
 @import "tailwindcss";
 
+@theme {
+  --color-deep-ink: #161C24;
+  --color-deep-ink-light: #1E293B;
+  --color-porcelain: #F8FAFC;
+  --color-steel: #94A3B8;
+  --color-cinnabar: #E63946;
+  --color-cinnabar-dark: #D22730;
+  --color-jade: #2DD4BF;
+
+  --drop-shadow-glow-jade: 0 0 15px rgba(45, 212, 191, 0.4);
+  --drop-shadow-glow-cinnabar: 0 0 15px rgba(230, 57, 70, 0.4);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: var(--color-deep-ink);
+  --foreground: var(--color-porcelain);
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+/* EASTER EGG ANIMATIONS */
+@keyframes wuxing-cycle {
+  0% {
+    color: #2DD4BF;
+    text-shadow: 0 0 10px rgba(45, 212, 191, 0.5);
+  }
+
+  /* Wood (Jade) */
+  25% {
+    color: #E63946;
+    text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+  }
+
+  /* Fire (Cinnabar) */
+  50% {
+    color: #EAB308;
+    text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);
+  }
+
+  /* Earth (Yellow) */
+  75% {
+    color: #F8FAFC;
+    text-shadow: 0 0 10px rgba(248, 250, 252, 0.5);
+  }
+
+  /* Metal (Porcelain) */
+  100% {
+    color: #3B82F6;
+    text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  }
+
+  /* Water (Blue) */
+}
+
+@keyframes scrollUp {
+  0% {
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes sweepLaser {
+
+  0%,
+  100% {
+    top: 0%;
+  }
+
+  50% {
+    top: 98%;
+  }
+}
+
+@keyframes matrixFall {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  90% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(1000%);
+    opacity: 0;
+  }
+}
+
+/* Custom Scrollbar Theme - Cinnabar & Ink Flow */
+
+/* 1. Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+  /* Steel Gray thumb, transparent track */
+}
+
+/* 2. WebKit Support (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+  width: 6px;
+  /* Vertical scrollbar width */
+  height: 6px;
+  /* Horizontal scrollbar height (if needed) */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  /* Keeps the floating card look intact */
+  margin-block: 1rem;
+  /* Adds padding to the top and bottom of the track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2);
+  /* Muted Steel Gray when resting */
+  border-radius: 10px;
+  /* Perfectly pill-shaped */
+  border: 2px solid transparent;
+  /* Creates a pseudo-margin around the thumb */
+  background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(45, 212, 191, 0.6);
+  /* Luminous Jade / Teal glow on hover */
+  border: 2px solid transparent;
+  background-clip: padding-box;
 }

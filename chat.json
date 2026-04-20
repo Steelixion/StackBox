@@ -1,0 +1,99 @@
+{
+  "conversations": [
+    {
+      "id": "conv-1776344443132",
+      "title": "hjhjhj",
+      "createdAt": "2026-04-16T13:00:43.132Z",
+      "messages": [
+        {
+          "id": "msg-1776344443138-5kw5a",
+          "role": "user",
+          "text": "hjhjhj",
+          "timestamp": "2026-04-16T13:00:43.138Z"
+        },
+        {
+          "id": "msg-1776344443142-k50n2",
+          "role": "ai",
+          "text": "[SIMULATION MODE] I am currently operating without a live Gemini connection, but I've reviewed the warehouse state: CURRENT WAREHOUSE STATE:. How can I assist with your supply chain optimization today?",
+          "timestamp": "2026-04-16T13:00:43.142Z"
+        }
+      ]
+    },
+    {
+      "id": "conv-1776344388419",
+      "title": "Analyze the latest regional market trends and iden...",
+      "createdAt": "2026-04-16T12:59:48.419Z",
+      "messages": [
+        {
+          "id": "msg-1776344388482-gwkwm",
+          "role": "user",
+          "text": "Analyze the latest regional market trends and identify top opportunities.",
+          "timestamp": "2026-04-16T12:59:48.482Z"
+        },
+        {
+          "id": "msg-1776344388502-tpkhy",
+          "role": "ai",
+          "text": "[SIMULATION MODE] I am currently operating without a live Gemini connection, but I've reviewed the warehouse state: CURRENT WAREHOUSE STATE:. How can I assist with your supply chain optimization today?",
+          "timestamp": "2026-04-16T12:59:48.503Z"
+        }
+      ]
+    },
+    {
+      "id": "conv-001",
+      "title": "Invoice #402 Analysis",
+      "createdAt": "2026-04-15T08:30:00.000Z",
+      "messages": [
+        {
+          "id": "msg-001-1",
+          "role": "user",
+          "text": "Analyze invoice #402 and ssummarize any discrepancies.",
+          "timestamp": "2026-04-15T08:30:05.000Z"
+        },
+        {
+          "id": "msg-001-2",
+          "role": "ai",
+          "text": "Invoice #402 from AeroMaterials shows a line-item discrepancy on Resin Mix B — the scanned price field contains an OCR error ('$120.S0' instead of '$120.50'). The corrected total should be $4,560.00. I recommend reviewing and syncing from the Manual Review Queue.",
+          "timestamp": "2026-04-15T08:30:08.000Z"
+        }
+      ]
+    },
+    {
+      "id": "conv-002",
+      "title": "Q3 Stock Forecast",
+      "createdAt": "2026-04-14T14:00:00.000Z",
+      "messages": [
+        {
+          "id": "msg-002-1",
+          "role": "user",
+          "text": "What does our Q3 stock forecast look like for Lithium-Ion Batteries?",
+          "timestamp": "2026-04-14T14:00:10.000Z"
+        },
+        {
+          "id": "msg-002-2",
+          "role": "ai",
+          "text": "Based on current demand forecasting data, Lithium-Ion Batteries are trending +34% over the next 90 days. With only 154 units currently in stock against a suggested threshold of 500, I recommend approving the restock pipeline immediately to avoid a supply gap ahead of the seasonal surge.",
+          "timestamp": "2026-04-14T14:00:14.000Z"
+        }
+      ]
+    },
+    {
+      "id": "conv-003",
+      "title": "Re-route Fleet Alpha",
+      "createdAt": "2026-04-13T09:15:00.000Z",
+      "messages": [
+        {
+          "id": "msg-003-1",
+          "role": "user",
+          "text": "Optimize fleet routing for the delayed shipment TRK-992-A.",
+          "timestamp": "2026-04-13T09:15:20.000Z"
+        },
+        {
+          "id": "msg-003-2",
+          "role": "ai",
+          "text": "Shipment TRK-992-A (Aluminum Sheets, Shanghai → LA) is currently overdue by 2 days. The sea freight leg has been cleared through customs. I recommend escalating to the carrier immediately and exploring an express rail redirect from the Port of LA to reduce further delay. ETA could be recovered by 1 day.",
+          "timestamp": "2026-04-13T09:15:25.000Z"
+        }
+      ]
+    }
+  ]
+}
