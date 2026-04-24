@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 
+
+
 interface Message {
   id: string;
   role: 'user' | 'ai';
@@ -40,6 +42,8 @@ const SUGGESTION_CARDS = [
 ];
 
 export default function ChatPage() {
+
+  const [role, setRole] = useState<'owner' | 'manager'>('manager'); // Default to manager
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [activeConvId, setActiveConvId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -116,7 +120,7 @@ export default function ChatPage() {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ conversationId: activeConvId, message: text }),
+        body: JSON.stringify({ conversationId: activeConvId, message: text, role: role }),
       });
 
       const data = await res.json();
