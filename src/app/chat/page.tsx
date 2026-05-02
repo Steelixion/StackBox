@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm'; // <--- ADD THIS IMPORT
+import { v4 as uuidv4 } from 'uuid';
 
 
 interface Message {
@@ -55,6 +57,15 @@ export default function ChatPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+
+  useEffect(() => {
+    if (!activeConvId) {
+      const newId = uuidv4();
+      setActiveConvId(newId);
+      console.log("New Conversation Session Initialized:", newId);
+    }
+  }, [activeConvId]);
+
   // ── Scroll to bottom on new messages ─────────────────────────────────────
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,12 +74,15 @@ export default function ChatPage() {
   // ── Load conversation list from JSON DB ───────────────────────────────────
   const loadConversations = useCallback(async () => {
     try {
-      const res = await fetch('/api/chat/conversations');
+      const res = await fetch('/api/chat/conversations', { cache: 'no-store' });
+      
       if (res.ok) {
         const data = await res.json();
         setConversations(data.conversations ?? []);
       }
-    } catch { /* silent */ }
+    } catch (error) { 
+        console.error("Failed to load conversations:", error);
+    }
   }, []);
 
   useEffect(() => { loadConversations(); }, [loadConversations]);
@@ -91,6 +105,7 @@ export default function ChatPage() {
 
   // ── Start a brand-new conversation ───────────────────────────────────────
   const startNewConversation = () => {
+    const newId = uuidv4(); // Generate a fresh ID for the new session
     setActiveConvId(null);
     setMessages([]);
     setInputMessage('');
@@ -116,6 +131,8 @@ export default function ChatPage() {
     setIsThinking(true);
     setApiWarning(false);
 
+    console.log(role, activeConvId, text);
+ 
     try {
       const res = await fetch('/api/chat/send', {
         method: 'POST',
@@ -149,11 +166,13 @@ export default function ChatPage() {
       }
 
       // Set conversation ID if brand new
-      if (!activeConvId && data.conversationId) {
-        setActiveConvId(data.conversationId);
-        // Refresh sidebar conversation list
-        await loadConversations();
-      }
+     const isAlreadyInSidebar = conversations.some(c => c.id === (data.conversationId || activeConvId));
+
+if (!isAlreadyInSidebar) {
+  if (data.conversationId) setActiveConvId(data.conversationId);
+  // It's a brand new chat! Fetch the fresh list from the database
+  await loadConversations();
+}
 
       // Add AI response
       setMessages((prev) => [
@@ -199,6 +218,7 @@ export default function ChatPage() {
         fixed inset-y-0 left-0 z-50 w-72 sm:w-80 bg-[#161C24] sm:rounded-2xl flex flex-col overflow-hidden shadow-2xl transition-transform duration-300 ease-out
         lg:translate-x-0 lg:relative lg:flex lg:z-0
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        print:hidden
       `}>
         {/* Sidebar Header */}
         <div className="p-5 border-b border-white/5 flex items-center justify-between">
@@ -266,19 +286,27 @@ export default function ChatPage() {
 
         <div className="flex-1 flex flex-col relative bg-[#161C24] sm:rounded-2xl lg:rounded-[2rem] shadow-2xl overflow-hidden min-w-0 border border-white/[0.02] mb-4 sm:mb-6 lg:mb-8">
 
-          {/* Mobile Header */}
-          <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#161C24] shrink-0 sticky top-0 z-10">
+          {/* Header area with PDF Export Button */}
+          <div className="flex items-center justify-between p-4 border-b border-white/5 bg-[#161C24] shrink-0 sticky top-0 z-10 print:hidden">
             <div className="flex items-center gap-3">
-              <button onClick={() => setIsSidebarOpen(true)} className="p-2 -ml-2 text-steel hover:text-white transition-colors">
+              <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 -ml-2 text-steel hover:text-white transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               </button>
               <span className="font-bold text-porcelain tracking-tight text-lg">StackBox <span className="text-teal-400">AI</span></span>
             </div>
-            <Link href="/dashboard" className="text-slate-400 hover:text-porcelain text-xs font-semibold uppercase tracking-wider px-3 py-1.5 rounded-full bg-white/5">
-              Hub
-            </Link>
+            
+            {/* THE NEW PDF BUTTON */}
+            <button 
+              onClick={() => window.print()} 
+              className="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-full bg-teal-500/10 hover:bg-teal-500/20 transition-all border border-teal-500/20"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Export PDF
+            </button>
           </div>
 
           {/* Message Area */}
@@ -341,9 +369,25 @@ export default function ChatPage() {
                         </svg>
                       </div>
                     )}
-                    <div className={`max-w-[85%] rounded-3xl px-6 py-4 text-[15px] leading-relaxed shadow-sm whitespace-pre-wrap ${msg.role === 'user' ? 'bg-slate-800 text-porcelain rounded-br-sm' : 'bg-transparent text-slate-200'}`}>
-                      {msg.text}
-                    </div>
+                    <div className={`max-w-[85%] rounded-3xl px-6 py-4 text-[15px] ${
+  msg.role === 'user' ? 'bg-slate-800 text-porcelain' : 'text-slate-200'
+}`}>
+  {msg.role === 'ai' ? (
+    <div className="prose prose-invert prose-sm max-w-none 
+      [&_table]:w-full [&_table]:border-collapse [&_table]:my-4 [&_table]:border [&_table]:border-white/20
+      [&_th]:border [&_th]:border-white/20 [&_th]:p-3 [&_th]:bg-white/10 [&_th]:text-left
+      [&_td]:border [&_td]:border-white/10 [&_td]:p-3">
+      
+      {/* ADD remarkGfm HERE */}
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+        {msg.text}
+      </ReactMarkdown>
+      
+    </div>
+  ) : (
+    msg.text
+  )}
+</div>
                   </div>
                 ))}
 
