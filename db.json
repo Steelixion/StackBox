@@ -125,6 +125,14 @@
   "invoiceReviewQueue": [],
   "invoiceLedger": [
     {
+      "id": "INV-6185",
+      "vendor": "SupplierCo",
+      "date": "2026-05-02",
+      "total": "$1,250.00",
+      "sync": true,
+      "lineItems": []
+    },
+    {
       "id": "INV-9923",
       "vendor": "Tech Foundry Silicon",
       "date": "2026-04-20",

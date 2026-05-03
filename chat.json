@@ -1,6 +1,44 @@
 {
   "conversations": [
     {
+      "id": "conv-1777727833588",
+      "title": "fe",
+      "createdAt": "2026-05-02T13:17:13.588Z",
+      "messages": [
+        {
+          "id": "msg-1777727833604-lsbgk",
+          "role": "user",
+          "text": "fe",
+          "timestamp": "2026-05-02T13:17:13.604Z"
+        },
+        {
+          "id": "msg-1777727833612-vzeyu",
+          "role": "ai",
+          "text": "[SIMULATION MODE] I am currently operating without a live Gemini connection, but I've reviewed the warehouse state: CURRENT WAREHOUSE STATE:. How can I assist with your supply chain optimization today?",
+          "timestamp": "2026-05-02T13:17:13.612Z"
+        }
+      ]
+    },
+    {
+      "id": "conv-1777727791147",
+      "title": "hrllo",
+      "createdAt": "2026-05-02T13:16:31.147Z",
+      "messages": [
+        {
+          "id": "msg-1777727791152-odlt0",
+          "role": "user",
+          "text": "hrllo",
+          "timestamp": "2026-05-02T13:16:31.152Z"
+        },
+        {
+          "id": "msg-1777727791156-l810l",
+          "role": "ai",
+          "text": "[SIMULATION MODE] I am currently operating without a live Gemini connection, but I've reviewed the warehouse state: CURRENT WAREHOUSE STATE:. How can I assist with your supply chain optimization today?",
+          "timestamp": "2026-05-02T13:16:31.156Z"
+        }
+      ]
+    },
+    {
       "id": "conv-1776689697998",
       "title": "Analyze the latest regional market trends and iden...",
       "createdAt": "2026-04-20T12:54:57.998Z",
