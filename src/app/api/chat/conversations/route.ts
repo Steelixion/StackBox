@@ -1,18 +1,31 @@
 import { NextResponse } from 'next/server';
-import { getConversations } from '@/lib/chat-db';
+import { supabase } from '@/lib/supabaseClient';
 
-/**
- * GET /api/chat/conversations
- * Returns the list of all conversations (newest first), without messages.
- */
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
-    const convos = await getConversations();
-    // Strip messages for the sidebar list to keep response small
-    const summaries = convos.map(({ id, title, createdAt }) => ({ id, title, createdAt }));
+  
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('id, title, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Supabase Error:", error.message);
+      return NextResponse.json({ error: 'Failed to load conversations' }, { status: 500 });
+    }
+
+    const summaries = data?.map(({ id, title, created_at }) => ({ 
+        id, 
+        title, 
+        createdAt: created_at 
+    })) || [];
+
     return NextResponse.json({ conversations: summaries });
+    
   } catch (error) {
     console.error('[/api/chat/conversations GET]', error);
-    return NextResponse.json({ error: 'Failed to load conversations' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

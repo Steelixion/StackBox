@@ -1,23 +1,24 @@
 import { NextResponse } from 'next/server';
-import { getConversationById } from '@/lib/chat-db';
+import { supabase } from '@/lib/supabaseClient';
 
-/**
- * GET /api/chat/conversations/[id]
- * Returns a single conversation with its full message history.
- */
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET() {
   try {
-    const { id } = await params;
-    const conv = await getConversationById(id);
-    if (!conv) {
-      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
+
+    const { data, error } = await supabase
+      .from('conversations')
+      .select('id, title, created_at')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Supabase Error:", error.message);
+      return NextResponse.json({ error: 'Failed to load conversations' }, { status: 500 });
     }
-    return NextResponse.json({ conversation: conv });
+
+    // 2. Send the real data back to page.tsx
+    return NextResponse.json({ conversations: data || [] });
+    
   } catch (error) {
-    console.error('[/api/chat/conversations/[id] GET]', error);
-    return NextResponse.json({ error: 'Failed to load conversation' }, { status: 500 });
+    console.error('[/api/chat/conversations GET]', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
