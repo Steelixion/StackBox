@@ -12,29 +12,36 @@ export default function LoginPage() {
   const [error, setError] = useState('');
 
   const handleCredentialLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+  e.preventDefault();
+  setError('');
+  setLoading(true);
 
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      if (res.ok) {
-        router.push('/dashboard');
-      } else {
-        const data = await res.json();
-        setError(data.error ?? 'Login failed. Please try again.');
-      }
-    } catch {
-      setError('Network error. Please check your connection.');
-    } finally {
-      setLoading(false);
+    const data = await res.json();
+
+    if (res.ok) {
+      // ✅ store session
+      localStorage.setItem('sb-session', JSON.stringify(data.session));
+
+      // ✅ SET COOKIE (THIS IS WHAT YOUR MIDDLEWARE NEEDS)
+      document.cookie = `sb-access-token=${data.session.access_token}; path=/`;
+
+      router.push('/dashboard');
+    } else {
+      setError(data.error ?? 'Login failed. Please try again.');
     }
-  };
+  } catch {
+    setError('Network error. Please check your connection.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   const fillDemo = () => {
     setEmail('admin@stackbox.ai');

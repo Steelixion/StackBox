@@ -1,9 +1,9 @@
 import { supabase } from "./supabaseClient";
 
-export async function ChatSaver(conversationId: string, chatName: string) {
-    if (!conversationId || !chatName) {
-        console.error("Missing conversationId or chatName");
-        return { success: false, error: "Missing conversationId or chatName" };
+export async function ChatSaver(conversationId: string, chatName: string, userId: string) {
+    if (!conversationId || !chatName || !userId) {
+        console.error("Missing conversationId, chatName or userId");
+        return { success: false, error: "Missing conversationId, chatName or userId" };
     }
 
     try {
@@ -23,7 +23,7 @@ export async function ChatSaver(conversationId: string, chatName: string) {
             const { error: insertError } = await supabase
                 .from('conversations')
                 .insert([
-                    { id: conversationId, title: chatName }
+                    { id: conversationId, title: chatName, user_id: userId }
                 ]);
 
             if (insertError) {
@@ -31,6 +31,7 @@ export async function ChatSaver(conversationId: string, chatName: string) {
                 return { success: false, error: insertError.message };
             }
         }
+
 
         return { success: true };
 

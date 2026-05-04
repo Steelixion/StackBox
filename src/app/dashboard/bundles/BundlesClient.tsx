@@ -1,8 +1,18 @@
 'use client';
 
 import React, { useOptimistic, useTransition, useState } from 'react';
-import type { BundlingStrategy } from '@/lib/db';
 import { toggleManualBundle, deleteManualBundle, createManualBundle } from '@/actions/inventory';
+
+// Aligning with the Supabase Schema types
+export type BundlingStrategy = {
+  id: number;
+  name: string;
+  projectedMargin: string; // Display string (e.g., "15%")
+  components: string[];
+  applied: boolean; // Maps to is_active in DB
+  updatedBy?: string;
+  createdBy?: string;
+};
 
 type OptimisticAction =
   | { type: 'TOGGLE'; payload: number }
@@ -44,14 +54,18 @@ export default function BundlesClient({
   );
 
   const handleToggle = (id: number) => {
-    // Prevent toggling optimistic items (they don't exist on server yet)
+    // Prevent toggling temp optimistic items
     if (Math.floor(id) !== id) return;
+
+    const bundle = optimisticBundles.find(b => b.id === id);
+    if (!bundle) return;
 
     startTransition(async () => {
       dispatchOptimistic({ type: 'TOGGLE', payload: id });
-      const res = await toggleManualBundle(id, 'Admin_MGR_01');
+      // Pass the inverse of current state to the server action
+      const res = await toggleManualBundle(id, !bundle.applied);
       if (!res?.success) {
-        setErrorMsg('Failed to sync toggle state with mainframe.');
+        setErrorMsg('Failed to sync toggle state with database.');
       }
     });
   };
@@ -61,7 +75,10 @@ export default function BundlesClient({
 
     startTransition(async () => {
       dispatchOptimistic({ type: 'DELETE', payload: id });
-      await deleteManualBundle(id, 'Admin_MGR_01');
+      const res = await deleteManualBundle(id);
+      if (!res?.success) {
+        setErrorMsg('Failed to remove strategy from database.');
+      }
     });
   };
 
@@ -74,20 +91,24 @@ export default function BundlesClient({
     setErrorMsg('');
 
     startTransition(async () => {
-      // 1. Optimistic UI update instantly renders card locally
       const mockBundle: BundlingStrategy = {
-        id: Math.random(), // Temp ID
+        id: Math.random(),
         name,
         projectedMargin: margin,
         components: selectedComponents,
         applied: false,
       };
-      dispatchOptimistic({ type: 'ADD', payload: mockBundle });
 
-      // 2. Server Action (which includes Zod Parsing internally)
-      const res = await createManualBundle({ name, projectedMargin: margin, components: selectedComponents }, 'Admin_MGR_01');
+      dispatchOptimistic({ type: 'ADD', payload: mockBundle });
+      //@ts-ignore
+      const res = await createManualBundle({
+        name,
+        projectedMargin: margin,
+        components: selectedComponents
+      });
+
       if (!res.success) {
-        setErrorMsg(res.error || 'Syntax constraint failed. Check inputs.');
+        setErrorMsg(res.error || 'Failed to commit bundle to matrix.');
       } else {
         setName('');
         setMargin('+15%');
@@ -179,7 +200,6 @@ export default function BundlesClient({
               )}
             </div>
 
-            {/* Fashionable List Box */}
             <div className="space-y-2">
               <label className="block text-[10px] font-bold text-steel tracking-widest uppercase mt-4 mb-2 flex justify-between items-center">
                 Selected Matrix Items
@@ -231,10 +251,10 @@ export default function BundlesClient({
           <div key={bundle.id} className={`p-6 rounded-2xl border transition-all ${bundle.applied ? 'bg-jade/5 border-jade/30 shadow-[0_0_20px_rgba(45,212,191,0.05)]' : 'bg-white border-steel/10 shadow-sm hover:border-steel/30'}`}>
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className={`text-lg font-bold ${bundle.applied ? 'text-deep-ink' : 'text-deep-ink'}`}>{bundle.name}</h3>
+                <h3 className="text-lg font-bold text-deep-ink">{bundle.name}</h3>
                 <p className="text-xs text-steel mt-1 font-mono">
-                  ID: #{bundle.id} <span className="mx-2">|</span>
-                  Updated By: {bundle.updatedBy || bundle.createdBy || 'SYSTEM'}
+                  ID: #{Math.floor(bundle.id)} <span className="mx-2">|</span>
+                  Created By: {bundle.updatedBy || bundle.createdBy || 'SYSTEM'}
                 </p>
               </div>
               <div className="flex items-center space-x-3">
@@ -242,7 +262,6 @@ export default function BundlesClient({
                   {bundle.projectedMargin} MARGIN
                 </span>
 
-                {/* Deletion / Revoke Action */}
                 <button
                   onClick={() => handleDelete(bundle.id)}
                   disabled={isPending || Math.floor(bundle.id) !== bundle.id}
@@ -262,7 +281,6 @@ export default function BundlesClient({
                 ))}
               </div>
 
-              {/* Central Toggle Matrix Logic */}
               <button
                 onClick={() => handleToggle(bundle.id)}
                 disabled={isPending || Math.floor(bundle.id) !== bundle.id}

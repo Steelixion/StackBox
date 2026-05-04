@@ -19,7 +19,7 @@ export default function DashboardPage() {
     const [k, g] = await Promise.all([fetchDashboardKPIs(), fetchMarketGraphData()]);
     setKpis(k);
     setGraphData(g);
-    
+
     try {
       const res = await fetch('/api/notifications');
       if (res.ok) {
@@ -29,7 +29,7 @@ export default function DashboardPage() {
     } catch {
       // fallback
     }
-    
+
     setIsLoading(false);
   }, []);
 
@@ -102,7 +102,7 @@ export default function DashboardPage() {
             </svg>
           </div>
           <div>
-            <p className="text-sm font-medium text-steel">Pending OCR Invoices</p>
+            <p className="text-sm font-medium text-steel">Pending Invoices</p>
             <p className="text-2xl font-bold text-deep-ink mt-1">
               {isLoading ? <span className="inline-block w-10 h-7 bg-porcelain animate-pulse rounded" /> : kpis?.pendingOcrInvoices}
             </p>
@@ -131,18 +131,18 @@ export default function DashboardPage() {
                   <AreaChart data={graphData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorInternal" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2DD4BF" stopOpacity={0.8}/>
-                        <stop offset="95%" stopColor="#2DD4BF" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#2DD4BF" stopOpacity={0.8} />
+                        <stop offset="95%" stopColor="#2DD4BF" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="colorMarket" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#0B0F19" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#0B0F19" stopOpacity={0}/>
+                        <stop offset="5%" stopColor="#0B0F19" stopOpacity={0.4} />
+                        <stop offset="95%" stopColor="#0B0F19" stopOpacity={0} />
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                     <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} dy={10} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#94A3B8' }} />
-                    <Tooltip 
+                    <Tooltip
                       contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                       labelStyle={{ fontWeight: 'bold', color: '#0B0F19', marginBottom: '4px' }}
                     />
@@ -262,8 +262,8 @@ export default function DashboardPage() {
             </div>
 
             <div className="px-8 pb-8 pt-4">
-              <button 
-                onClick={() => router.push('/dashboard/alerts')} 
+              <button
+                onClick={() => router.push('/dashboard/alerts')}
                 className="w-full p-4 text-xs font-medium text-steel hover:text-deep-ink bg-porcelain/50 rounded-xl transition-colors"
               >
                 View All Alerts & History

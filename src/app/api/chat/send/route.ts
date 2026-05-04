@@ -8,18 +8,28 @@ import { emailTool } from "@/lib/emailTool";
 import { getUserContactTool } from "@/lib/userTool";
 import { ChatSaver } from "@/lib/ChatSaver";
 
+import { getUserProfile } from "@/actions/auth";
+
 export async function POST(req: Request) {
   try {
-    const { message, conversationId, role } = await req.json();
+    const { message, conversationId } = await req.json();
 
+    // ── Security Check: Verify Role ──────────────────────────────────────────
+    const profile = await getUserProfile();
+    
+    if (!profile) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const ownerPrompt = `You are a Business Consultant for a Warehouse Owner. 
-    Focus on financial health and market opportunities. Avoid deep technical jargon.`;
+    const allowedRoles = ['Manager', 'Owner'];
+    if (!allowedRoles.includes(profile.role)) {
+      return NextResponse.json({ error: "Access Denied: You must be a Manager or Owner to use the AI assistant." }, { status: 403 });
+    }
 
-    const managerPrompt = `You are an Operations Lead for a Warehouse Manager. 
-    Focus on precision, inventory counts, and logistics IDs. Be very technical.`;
+    const activeSystemPrompt = profile.role === 'Owner' ? 
+      `You are a Business Consultant for a Warehouse Owner. Focus on financial health and market opportunities. Avoid deep technical jargon.` : 
+      `You are an Operations Lead for a Warehouse Manager. Focus on precision, inventory counts, and logistics IDs. Be very technical.`;
 
-    const activeSystemPrompt = role === 'owner' ? ownerPrompt : managerPrompt;
 
     const formattedHistory = await getConversationHistory(conversationId);
 
@@ -33,7 +43,8 @@ export async function POST(req: Request) {
 
     const userMessage = message;
     const chatTitle = userMessage.substring(0, 30) + "..."; 
-    await ChatSaver(conversationId, chatTitle);
+    await ChatSaver(conversationId, chatTitle, profile.id);
+
 
     const model = new ChatGoogleGenerativeAI(
 
@@ -65,9 +76,12 @@ export async function POST(req: Request) {
     });
 
     const latestMessage = res.messages[res.messages.length - 1];
-    const aiResponse = latestMessage.content;
+    const aiResponse = typeof latestMessage.content === 'string' 
+      ? latestMessage.content 
+      : JSON.stringify(latestMessage.content);
 
     await saveChatExchange(conversationId, message, aiResponse);
+
 
     return NextResponse.json({
       message: { role: 'ai', text: aiResponse },

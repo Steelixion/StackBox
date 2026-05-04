@@ -85,7 +85,7 @@ export default function InvoicesOCRPage() {
     <div className="space-y-6 pb-12 relative">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-deep-ink">Invoices (OCR) Hub</h1>
+        <h1 className="text-2xl font-bold text-deep-ink">Invoices Hub</h1>
         <p className="text-steel text-sm mt-1">Automated document intake, AI extraction, and verification pipeline.</p>
       </div>
 
