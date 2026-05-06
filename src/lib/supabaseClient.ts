@@ -21,4 +21,7 @@ if (!supabaseUrl || !key) {
   }
 }
 
-export const supabase = createClient(supabaseUrl || '', key || '');
+// Create a dummy client if keys are missing on the client side to prevent crashes
+export const supabase = (supabaseUrl && key) 
+  ? createClient(supabaseUrl, key) 
+  : { auth: { signOut: async () => { console.warn("Cannot sign out without env keys") } } } as any;

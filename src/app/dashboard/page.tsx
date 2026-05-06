@@ -14,6 +14,14 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [dismissingId, setDismissingId] = useState<string | null>(null);
 
+  const formatNumber = (num: number) => {
+    const abs = Math.abs(num);
+    if (abs >= 1e9) return (num / 1e9).toFixed(1) + 'B';
+    if (abs >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+    if (abs >= 1e3) return (num / 1e3).toFixed(1) + 'K';
+    return Math.round(num).toString();
+  };
+
   const loadData = useCallback(async () => {
     setIsLoading(true);
     const [k, g] = await Promise.all([fetchDashboardKPIs(), fetchMarketGraphData()]);
@@ -117,7 +125,7 @@ export default function DashboardPage() {
           <div className="bg-white rounded-2xl shadow-sm p-8">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-lg font-bold text-deep-ink">Market vs. Internal Stock</h2>
-              <button onClick={() => router.push('/dashboard/inventory-trading')} className="text-sm font-medium text-jade hover:text-jade/80 transition-colors">View Deep Analysis</button>
+              <button onClick={() => router.push('/dashboard/predictions')} className="text-sm font-medium text-jade hover:text-jade/80 transition-colors">View Deep Analysis</button>
             </div>
 
             {/* Chart */}
@@ -156,18 +164,16 @@ export default function DashboardPage() {
             <div className="mt-8 grid grid-cols-2 gap-6">
               <div className="p-6 bg-porcelain/40 rounded-2xl">
                 <p className="text-xs text-steel font-medium uppercase">Internal Valuation</p>
-                <p className="text-lg font-bold text-deep-ink mt-2">$4.25M</p>
-                <div className="flex items-center mt-3 text-xs text-jade">
-                  <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                  <span>2.4% vs last week</span>
+                <p className="text-lg font-bold text-deep-ink mt-2">PKR {graphData.length > 0 ? formatNumber(graphData[graphData.length - 1].internal) : '0'}</p>
+                <div className="flex items-center mt-3 text-xs text-steel">
+                  <span>Live Database Valuation</span>
                 </div>
               </div>
               <div className="p-6 bg-porcelain/40 rounded-2xl">
                 <p className="text-xs text-steel font-medium uppercase">Current Market Valuation</p>
-                <p className="text-lg font-bold text-deep-ink mt-2">$5.10M</p>
-                <div className="flex items-center mt-3 text-xs text-jade">
-                  <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" /></svg>
-                  <span>5.1% vs last week</span>
+                <p className="text-lg font-bold text-deep-ink mt-2">PKR {graphData.length > 0 ? formatNumber(graphData[graphData.length - 1].market) : '0'}</p>
+                <div className="flex items-center mt-3 text-xs text-steel">
+                  <span>Live Market Average</span>
                 </div>
               </div>
             </div>

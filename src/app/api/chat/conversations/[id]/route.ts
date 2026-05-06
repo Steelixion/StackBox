@@ -38,7 +38,7 @@ export async function GET(
     }
 
     // Format messages for the UI
-    const formattedMessages = messages?.map(m => ({
+    const formattedMessages = messages?.map((m: any) => ({
         id: m.id,
         role: m.role,
         text: m.content,

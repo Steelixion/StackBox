@@ -16,7 +16,7 @@ export async function fetchShipments() {
     // Mapping based on your specific JSON:
     // "estimated_arrival" -> "expectedArrival"
     // Missing "product" -> Fallback to "Industrial Goods"
-    return (data || []).map((s) => ({
+    return (data || []).map((s: any) => ({
       id: s.id,
       product: s.product || "Industrial Goods",
       status: s.status,
@@ -66,7 +66,7 @@ export async function fetchQrCodes() {
 
     if (error) throw error;
 
-    return (data || []).map((q) => ({
+    return (data || []).map((q: any) => ({
       batch: q.batch,
       item: q.item_name,
       qty: q.quantity,

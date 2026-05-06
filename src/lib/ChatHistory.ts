@@ -15,7 +15,7 @@ export async function getConversationHistory(conversationId: string) {
     return [];
   }
 
-  return data.map(msg => ({
+  return data.map((msg: any) => ({
     role: msg.role === 'ai' ? 'assistant' : 'user',
     content: msg.content
   }));

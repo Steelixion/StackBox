@@ -24,10 +24,10 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to load conversations' }, { status: 500 });
     }
 
-    const summaries = data?.map(({ id, title, created_at }) => ({ 
-        id, 
-        title, 
-        createdAt: created_at 
+    const summaries = data?.map((row: any) => ({ 
+        id: row.id, 
+        title: row.title, 
+        createdAt: row.created_at 
     })) || [];
 
     return NextResponse.json({ conversations: summaries });

@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / seed scripts (may contain secrets)
+/scratch/
+seed_sales.js

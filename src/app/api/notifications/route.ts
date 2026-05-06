@@ -10,7 +10,7 @@ export async function GET() {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
   // Map database fields to the "NotificationItem" format the frontend expects
-  const notifications = data.map(alert => ({
+  const notifications = data.map((alert: any) => ({
     id: alert.id,
     title: alert.title,
     message: alert.message,

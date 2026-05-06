@@ -25,8 +25,8 @@ export async function fetchValuationMetrics() {
   // Optimization: Only select what we need to reduce memory overhead
   const { data } = await supabase.from('items').select('count, cost_price, selling_price');
 
-  const internalVal = data?.reduce((acc, i) => acc + (Number(i.count || 0) * Number(i.cost_price || 0)), 0) || 0;
-  const marketVal = data?.reduce((acc, i) => acc + (Number(i.count || 0) * Number(i.selling_price || 0)), 0) || 0;
+  const internalVal = data?.reduce((acc: number, i: any) => acc + (Number(i.count || 0) * Number(i.cost_price || 0)), 0) || 0;
+  const marketVal = data?.reduce((acc: number, i: any) => acc + (Number(i.count || 0) * Number(i.selling_price || 0)), 0) || 0;
 
   const total = internalVal + marketVal;
   return {
@@ -40,7 +40,7 @@ export async function fetchValuationMetrics() {
 
 export async function dismissAlert(id: string) {
   await supabase.from('system_alerts').delete().eq('id', id);
-  revalidatePath('/inventory-trading');
+  revalidatePath('/dashboard/predictions');
 }
 
 export async function approveRestockItem(id: number, userId: string) {
@@ -56,13 +56,13 @@ export async function approveRestockItem(id: number, userId: string) {
 
 export async function applyGlobalMatrixEngine() {
   await supabase.from('bundling_strategies').update({ applied: true }).eq('applied', false);
-  revalidatePath('/inventory-trading');
+  revalidatePath('/dashboard/predictions');
   return true;
 }
 
 export async function fetchInventoryProducts() {
   const { data } = await supabase.from('items').select('name');
-  return data?.map(item => item.name) || [];
+  return data?.map((item: any) => item.name) || [];
 }
 
 export async function fetchBundlingStrategies() {
@@ -72,7 +72,7 @@ export async function fetchBundlingStrategies() {
     .eq('is_deleted', false)
     .order('updated_at', { ascending: false });
 
-  return (data || []).map(b => ({
+  return (data || []).map((b: any) => ({
     id: b.id,
     name: b.name,
     projectedMargin: `${b.discount_pct}%`,
@@ -99,7 +99,7 @@ export async function createManualBundle(payload: any, userId: string) {
     .single();
 
   if (error) return { success: false, error: error.message };
-  revalidatePath('/inventory-trading'); // Update based on your actual route
+  revalidatePath('/dashboard/predictions'); // Update based on your actual route
   return { success: true, data };
 }
 
@@ -110,7 +110,7 @@ export async function toggleManualBundle(id: number, activeState: boolean) {
     .eq('id', id);
 
   if (error) return { success: false };
-  revalidatePath('/inventory-trading');
+  revalidatePath('/dashboard/predictions');
   return { success: true };
 }
 
@@ -122,6 +122,6 @@ export async function deleteManualBundle(id: number) {
     .eq('id', id);
 
   if (error) return { success: false };
-  revalidatePath('/inventory-trading');
+  revalidatePath('/dashboard/predictions');
   return { success: true };
 }
