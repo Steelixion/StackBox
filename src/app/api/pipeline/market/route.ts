@@ -20,6 +20,19 @@ export async function POST(req: NextRequest) {
   if (req.headers.get('x-pipeline-secret') !== PIPELINE_SECRET) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+  return runMarketPipeline();
+}
+
+// Vercel Cron handler — authenticates via CRON_SECRET
+export async function GET(req: NextRequest) {
+  const authHeader = req.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  return runMarketPipeline();
+}
+
+async function runMarketPipeline() {
 
   try {
     // Fetch all items
