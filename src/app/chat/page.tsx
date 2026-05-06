@@ -250,6 +250,9 @@ export default function ChatPage() {
               <button onClick={() => setIsSidebarOpen(true)} className="lg:hidden p-2 -ml-2 text-steel hover:text-white transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
               </button>
+              <Link href="/dashboard" className="p-2 -ml-2 text-steel hover:text-teal-400 transition-colors" title="Back to Dashboard">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+              </Link>
               <span className="font-bold text-porcelain tracking-tight text-lg">StackBox <span className="text-teal-400">AI</span></span>
             </div>
             <button onClick={() => window.print()} className="flex items-center gap-2 text-teal-400 hover:text-teal-300 text-xs font-semibold uppercase tracking-wider px-4 py-2 rounded-full bg-teal-500/10 hover:bg-teal-500/20 transition-all border border-teal-500/20">

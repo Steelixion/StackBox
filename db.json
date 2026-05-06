@@ -2,8 +2,35 @@
   "users": [],
   "shipments": [],
   "qrCodes": [],
-  "invoiceReviewQueue": [],
-  "invoiceLedger": [],
+  "invoiceReviewQueue": [
+    {
+      "id": "INV-7193",
+      "vendor": "GlobalParts Ltd.",
+      "confidence": 74,
+      "raw": {
+        "vendor": "GlobalParts Ltd. (OCR error)",
+        "lines": [
+          {
+            "item": "Auto-extracted Item A",
+            "qty": "112",
+            "price": "$2.48"
+          }
+        ]
+      },
+      "image": "https://placehold.co/400x550/1E293B/94A3B8?text=INVOICE+OCR+74%25+Confidence",
+      "createdAt": "2026-05-06T19:47:45.271Z"
+    }
+  ],
+  "invoiceLedger": [
+    {
+      "id": "INV-7411",
+      "vendor": "SupplierCo",
+      "date": "2026-05-05",
+      "total": "$1,250.00",
+      "sync": true,
+      "lineItems": []
+    }
+  ],
   "tradingAlerts": [],
   "restockSuggestions": [],
   "acquisitionTargets": [],

@@ -197,7 +197,13 @@ export default function EmployeesPage() {
                       <td colSpan={4} className="px-6 py-12 text-center text-steel">No employees found.</td>
                     </tr>
                   ) : (
-                    employees.map((emp) => (
+                    employees
+                      .filter((emp) => {
+                        if (user?.role === 'Manager') return emp.role === 'Employee';
+                        if (user?.role === 'Owner') return ['Employee', 'Manager'].includes(emp.role);
+                        return true;
+                      })
+                      .map((emp) => (
                       <tr key={emp.id} className="hover:bg-porcelain/50 transition-colors">
                         <td className="px-6 py-4">
                           <div className="flex items-center">
@@ -208,7 +214,11 @@ export default function EmployeesPage() {
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${emp.role === 'Manager' || emp.role === 'Owner' ? 'bg-jade/10 text-jade' : 'bg-steel/10 text-steel'}`}>
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            emp.role === 'Owner' ? 'bg-cinnabar/10 text-cinnabar border border-cinnabar/20' : 
+                            emp.role === 'Manager' ? 'bg-jade/10 text-jade border border-jade/20' : 
+                            'bg-steel/10 text-steel border border-steel/20'
+                          }`}>
                             {emp.role}
                           </span>
                         </td>
